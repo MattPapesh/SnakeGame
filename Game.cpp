@@ -175,10 +175,14 @@ cout << UserInput <<endl;
 system("cls");
 }
 }
-
-
-
-
+//My problem is that getch() gets the key that is being pressed at any given time to then determine the movement
+//of the player and then the screen refreshes. But getch() waits for an input of any kind. The keys w a s and d will
+//change the position of the player, others won't but still count. Sense the computer waits for a input the loop doesn't
+// continue and in a game like snake the snake constantly moves until direction changes. This cannot occur because
+// the computer waits for input each time the player moves one unit. If you added while loops into the if statements then
+//the player will continously move but then will not have a way out of the loop so then the player can't do anything else.
+//If you added a if statement to getch() then how would you access it only when necessary?
+//Let me know what you think because I'm interested as to what you think might be a good approach.
 
 
 
