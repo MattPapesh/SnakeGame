@@ -7,6 +7,7 @@
 
 #include <conio.h>
 
+#include <ctime>
 using namespace std;
 
     bool GameOver = false;
@@ -18,12 +19,13 @@ using namespace std;
     int cmmdPromptDis = 25;
 
 
-  int fruitX, fruitY;
+  int fruitX, fruitY, fruitRandPosIncreamentor;
 
   int initialX = ((Width -6)/2);
   int initialY = (Height /2);
   int X = initialX ;
-  int Y = (initialY );
+  int Y = initialY ;
+  int tempX = (initialX*2);
   int UserInput, holdUserValue, verifyInput;
 
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -32,9 +34,22 @@ void  Dis()
 {
     for (int i = 0; i < cmmdPromptDis; i++)
     {
-        cout << " ";
+        printf  (" ");
     }
 }
+int i;
+void FruitCoords()
+{
+
+
+    srand(time(NULL));
+    fruitX = (rand()%Width);
+    fruitY = (rand()%Height);
+
+
+
+}
+
 
 void hBound()
 {
@@ -43,43 +58,43 @@ void hBound()
 
     for (int i=0; i < Width; i++)
     {
-        cout << "_";
+        printf ("_");
     }
 
-    cout << endl;
+    printf ("\n");
     Dis();
     for (int i=0; i < Width; i++)
 
     {
-        cout << "_";
+        printf ("_");
     }
 
 
 }
 void hBound2()
 {
-    cout << "| |";
+    printf ("| |");
 
  for (int i=6; i < (Width); i++)
     {
-        cout << "_";
+        printf ("_");
     }
 
-cout << "| |";
+printf ("| |");
 
-    cout << endl;
+    printf ("\n");
 
     Dis();
 
-    cout << "| |";
+    printf ("| |");
 
     for (int i=6; i < Width; i++)
 
     {
-        cout << "_";
+        printf ("_");
     }
 
-    cout << "| |"<< endl;
+    printf ("| |\n");
 }
 
 void DisBounderies()
@@ -87,42 +102,62 @@ void DisBounderies()
 
     Dis();
     hBound();
-    cout << endl;
+    printf ("\n");
 
 int return1 = 0;
+
     for (int i=0; i < Height; i++)
     {return1++;
          Dis();
 
+      if (return1 == fruitY)
+      {
+          printf ("| |");
+          for (int i = 0; i < (fruitX-1); i++)
+          {
+                printf (" ");
+          }
+                SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
+
+                printf ("O");
+
+                SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+            for (int i = 0; i < (tempX - fruitX); i++)
+            {
+                printf (" ");
+            }
+      }
 
 
-      if (return1 == Y) /// This line is to find out the location of the player and print it upon the right line in the right position.
-{ cout << "| |";
+      else if (return1 == Y) /// This line is to find out the location of the player and print it upon the right line in the right position.
+      { printf ("| |");
      for (int i = 0; i < (X-1); i++)
      {
-         cout << " ";
+         printf (" ");
      }
 
  SetConsoleTextAttribute(h,FOREGROUND_GREEN|FOREGROUND_INTENSITY);
 
-     cout << "O";
+     printf ("O");
 
 SetConsoleTextAttribute(h,FOREGROUND_BLUE);
-    int tempX = (initialX*2);
+
      for (int i = 0; i < (tempX - X); i++)
      {
-         cout << " ";
+         printf (" ");
      }
 }
 
 else
-{
-     cout <<"| |                                                                                              ";
+{ printf ("| |");
+     for (int i = 0; i < tempX; i++) {printf(" ");}
+
 }
 
-     for (int i; i < (X - Width); i++) {cout << " ";}
+     for (int i; i < (X - Width); i++) {printf (" ");}
 
-      cout << "| |" << endl;
+      printf ("| |\n");
     }
 
     Dis();
@@ -166,7 +201,8 @@ if (UserInput == 115) {Y++; holdUserValue = 115; verifyInput++;}
 if (UserInput == 97) {X--; holdUserValue = 97; verifyInput++;}
 
 if (UserInput == 100) {X++; holdUserValue = 100; verifyInput++;}
-cout << UserInput <<endl;
+cout << UserInput;
+ printf ("\n");
 if(verifyInput > 0) {UserInput = holdUserValue;}
 }
 
@@ -187,7 +223,7 @@ void Logic()
 {
 ControlLogic();
 
-
+ FruitCoords();
 
 
 }
@@ -205,16 +241,17 @@ main()
 
 while (!ProgramEsc)
   {
-
+fruitRandPosIncreamentor++;
   GameOver = false;
 
     while (!GameOver)
     {
-Setup();
+        Setup();
         Logic();
 
 
 
+cout << "x: "<< fruitX<< endl<< "y: "<<fruitY<<endl;
         Game();
 
 system("cls");
@@ -237,21 +274,6 @@ system("cls");
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
