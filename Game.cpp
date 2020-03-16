@@ -7,74 +7,109 @@
 
 #include <conio.h>
 
-using namespace std;
+#include <ctime>
+
 
     bool GameOver = false;
+    bool GameRestart = false;
+    bool ProgramEsc = false;
+    bool FruitPresent = false;
+    bool FruitCoordsVerify = false;
 
-    int Height = 34;
-    int Width = 100;
+    int Height = 10;//17
+    int Width = 30;//50
     int cmmdPromptDis = 25;
-    int SleepSpeed = .1;
+
 
   int fruitX, fruitY;
 
   int initialX = ((Width -6)/2);
   int initialY = (Height /2);
   int X = initialX ;
-  int Y = (initialY );
-  int UserInput, UserInput2;
+  int Y = initialY ;
+  int tempX = (initialX*2);
+  int UserInput, holdUserValue, verifyInput;
 
+HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
 void  Dis()
 {
     for (int i = 0; i < cmmdPromptDis; i++)
     {
-        cout << " ";
+        printf  (" ");
     }
 }
+
+void FruitCoords()
+{
+
+    while (!FruitCoordsVerify)
+    {
+        srand(time(NULL));
+
+    if (!FruitPresent)
+    {
+        fruitX = (rand()%(Width-6));
+        fruitY = (rand()%(Height-2));
+        FruitPresent = true;
+        FruitCoordsVerify = true;
+    }
+        if (fruitY < 2)
+        {
+         fruitY = fruitY + 2;
+        }
+
+
+    }
+
+
+}
+
 
 void hBound()
 {
 
+ SetConsoleTextAttribute(h,FOREGROUND_BLUE);
+
     for (int i=0; i < Width; i++)
     {
-        cout << "_";
+        printf ("_");
     }
 
-    cout << endl;
+    printf ("\n");
     Dis();
     for (int i=0; i < Width; i++)
 
     {
-        cout << "_";
+        printf ("_");
     }
 
 
 }
 void hBound2()
 {
-    cout << "| |";
+    printf ("| |");
 
  for (int i=6; i < (Width); i++)
     {
-        cout << "_";
+        printf ("_");
     }
 
-cout << "| |";
+printf ("| |");
 
-    cout << endl;
+    printf ("\n");
 
     Dis();
 
-    cout << "| |";
+    printf ("| |");
 
     for (int i=6; i < Width; i++)
 
     {
-        cout << "_";
+        printf ("_");
     }
 
-    cout << "| |"<< endl;
+    printf ("| |\n");
 }
 
 void DisBounderies()
@@ -82,37 +117,99 @@ void DisBounderies()
 
     Dis();
     hBound();
-    cout << endl;
+    printf ("\n");
 
 int return1 = 0;
+
     for (int i=0; i < Height; i++)
     {return1++;
          Dis();
 
+      if (return1 == fruitY)
+      {
+          printf ("| |");
 
+          if (fruitY != Y)
+          {
 
-      if (return1 == Y) /// This line is to find out the location of the player and print it upon the right line in the right position.
-{ cout << "| |";
+          for (int i = 0; i < (fruitX-1); i++)
+          {
+                printf (" ");
+          }
+                SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
+
+                printf ("O");
+
+                SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+            for (int i = 0; i < (tempX - fruitX); i++)
+            {
+                printf (" ");
+            }
+      }
+      else
+      {
+          if (X < fruitX)
+          {
+              for (int i = 0; i < (X - 1); i++)
+              {
+                  printf (" ");
+              }
+
+              SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+
+              printf ("0");
+
+              SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+              for (int i = 0; i < (fruitX - 1); i++)
+              {
+                  printf (" ");
+              }
+
+              SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
+
+              printf ("O");
+
+              SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+              for (int i = 0; i < (tempX - fruitX); i++)
+              {
+                  printf (" ");
+              }
+
+          }
+      }
+    }
+
+      else if (return1 == Y) /// This line is to find out the location of the player and print it upon the right line in the right position.
+      { printf ("| |");
      for (int i = 0; i < (X-1); i++)
      {
-         cout << " ";
+         printf (" ");
      }
-     cout << "O";
-    int tempX = (initialX*2);
+
+ SetConsoleTextAttribute(h,FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+
+     printf ("O");
+
+SetConsoleTextAttribute(h,FOREGROUND_BLUE);
+
      for (int i = 0; i < (tempX - X); i++)
      {
-         cout << " ";
+         printf (" ");
      }
 }
 
 else
-{
-     cout <<"| |                                                                                              ";
+{ printf ("| |");
+     for (int i = 0; i < tempX; i++) {printf(" ");}
+
 }
 
-     for (int i; i < (X - Width); i++) {cout << " ";}
+     for (int i; i < (X - Width); i++) {printf (" ");}
 
-      cout << "| |" << endl;
+      printf ("| |\n");
     }
 
     Dis();
@@ -129,20 +226,68 @@ void Setup()
 }
 
 
-void Logic()
+
+
+void OtherControls()
 {
+    if (kbhit() == 1)
+  {
+      UserInput = getch();
 
+  }
 
+if (UserInput == 27) {GameOver = true; ProgramEsc = true;}
 
+if (UserInput == 32) {getch();}
 
+if (UserInput == 114) {GameOver = true; Sleep(500); GameRestart = true;}
 
+}
+
+void GameControls()
+{
+ if (UserInput == 119) {Y--; holdUserValue = 119; verifyInput++;}
+
+if (UserInput == 115) {Y++; holdUserValue = 115; verifyInput++;}
+
+if (UserInput == 97) {X--; holdUserValue = 97; verifyInput++;}
+
+if (UserInput == 100) {X++; holdUserValue = 100; verifyInput++;}
+std::cout << UserInput;
+ printf ("\n");
+if(verifyInput > 0) {UserInput = holdUserValue;}
+}
+
+void KeyBoardFunctions()
+{
+ OtherControls();
+ GameControls();
 }
 
 void ControlLogic()
 {
+ KeyBoardFunctions();
+
 
 }
 
+void PlayerDeath()
+{
+    if (X >= )
+    {
+
+    }
+}
+
+void Logic()
+{
+ControlLogic();
+
+ FruitCoords();
+
+ PlayerDeath();
+
+}
 void Game()
 {
 
@@ -154,49 +299,45 @@ void Game()
 
 main()
 {
+
+while (!ProgramEsc)
+  {
+
+  GameOver = false;
+
     while (!GameOver)
     {
-
         Setup();
-
         Logic();
 
+    if (X == fruitX && Y == fruitY)
+    {
+        FruitPresent = false;
+    }
+
+std::cout << "x: "<< fruitX<< std::endl<< "y: "<<fruitY<<std::endl;
         Game();
 
-
-    UserInput = getch();
-
-
-if (UserInput == 119) {Y--; Sleep(SleepSpeed);}
-if (UserInput == 115) {Y++; Sleep(SleepSpeed);}
-if (UserInput == 97) {X--; Sleep(SleepSpeed);}
-if (UserInput == 100) {X++; Sleep(SleepSpeed);}
-cout << UserInput <<endl;
 system("cls");
+        }
+
+        if (GameRestart = true)
+    {
+        GameOver = true;
+        X = initialX;
+        Y = initialY;
+        UserInput = 32;
+        holdUserValue = 0;
+        system("cls");
+    }
+    else
+    {
+        ProgramEsc = true;
+    }
+
+  }
+
 }
-}
-//My problem is that getch() gets the key that is being pressed at any given time to then determine the movement
-//of the player and then the screen refreshes. But getch() waits for an input of any kind. The keys w a s and d will
-//change the position of the player, others won't but still count. Sense the computer waits for a input the loop doesn't
-// continue and in a game like snake the snake constantly moves until direction changes. This cannot occur because
-// the computer waits for input each time the player moves one unit. If you added while loops into the if statements then
-//the player will continously move but then will not have a way out of the loop so then the player can't do anything else.
-//If you added a if statement to getch() then how would you access it only when necessary?
-//Let me know what you think because I'm interested as to what you think might be a good approach.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
