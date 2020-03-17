@@ -8,18 +8,20 @@
 #include <conio.h>
 
 #include <ctime>
-using namespace std;
+
 
     bool GameOver = false;
     bool GameRestart = false;
     bool ProgramEsc = false;
+    bool FruitPresent = false;
+    bool FruitCoordsVerify = false;
 
-    int Height = 34;
-    int Width = 100;
+    int Height = 10 ;//17
+    int Width = 30;//50
     int cmmdPromptDis = 25;
 
 
-  int fruitX, fruitY, fruitRandPosIncreamentor;
+  int fruitX, fruitY;
 
   int initialX = ((Width -6)/2);
   int initialY = (Height /2);
@@ -37,15 +39,28 @@ void  Dis()
         printf  (" ");
     }
 }
-int i;
+
 void FruitCoords()
 {
 
+    while (!FruitCoordsVerify)
+    {
+        srand(time(NULL));
 
-    srand(time(NULL));
-    fruitX = (rand()%Width);
-    fruitY = (rand()%Height);
+    if (!FruitPresent)
+    {
+        fruitX = (rand()%(Width-6));
+        fruitY = (rand()%(Height-2));
+        FruitPresent = true;
+        FruitCoordsVerify = true;
+    }
+        if (fruitY < 2)
+        {
+         fruitY = fruitY + 2;
+        }
 
+
+    }
 
 
 }
@@ -96,7 +111,7 @@ printf ("| |");
 
     printf ("| |\n");
 }
-
+///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
 void DisBounderies()
 {
 
@@ -113,6 +128,10 @@ int return1 = 0;
       if (return1 == fruitY)
       {
           printf ("| |");
+
+          if (fruitY != Y)
+          {
+
           for (int i = 0; i < (fruitX-1); i++)
           {
                 printf (" ");
@@ -129,8 +148,93 @@ int return1 = 0;
             }
       }
 
+          if (X < fruitX && Y == fruitY)
+          {
+              for (int i = 0; i < (X - 1); i++)
+              {
+                  printf (" ");
+              }
 
-      else if (return1 == Y) /// This line is to find out the location of the player and print it upon the right line in the right position.
+              SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+
+              printf ("O");
+
+              SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+              for (int i = 0; i < ((fruitX - 1)-(X)); i++)
+              {
+                  printf (" ");
+              }
+
+              SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
+
+              printf ("O");
+
+              SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+              for (int i = 0; i < (tempX - fruitX); i++)
+              {
+                  printf (" ");
+              }
+
+          }
+
+            if (X > fruitX && Y == fruitY)
+            {
+                    for (int i = 0; i < (fruitX - 1); i++)
+                    {
+                        printf (" ");
+                    }
+
+                    SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
+
+                    printf ("O");
+
+                    SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+                    for (int i = 0; i < ((X - 1) - fruitX); i++)
+                    {
+                        printf (" ");
+                    }
+
+                    SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+
+                    printf ("O");
+
+                    SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+                    for (int i = 0; i < (tempX - X); i++)
+                    {
+                        printf (" ");
+
+                    }
+
+            }
+
+        if (fruitX == X && fruitY == Y)
+        {
+            for (int i = 0; i < (X -1); i++)
+            {
+                 printf (" ");
+            }
+
+            SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+
+            printf ("O");
+
+            SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+            for (int i = 0; i < (tempX - fruitX); i++)
+            {
+                printf (" ");
+            }
+        }
+
+    }
+
+///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        if (return1 == Y && Y != fruitY) /// This line is to find out the location of the player and print it upon the right line in the right position.
       { printf ("| |");
      for (int i = 0; i < (X-1); i++)
      {
@@ -149,7 +253,7 @@ SetConsoleTextAttribute(h,FOREGROUND_BLUE);
      }
 }
 
-else
+else if (return1 != Y && return1 != fruitY)
 { printf ("| |");
      for (int i = 0; i < tempX; i++) {printf(" ");}
 
@@ -201,7 +305,7 @@ if (UserInput == 115) {Y++; holdUserValue = 115; verifyInput++;}
 if (UserInput == 97) {X--; holdUserValue = 97; verifyInput++;}
 
 if (UserInput == 100) {X++; holdUserValue = 100; verifyInput++;}
-cout << UserInput;
+std::cout << UserInput;
  printf ("\n");
 if(verifyInput > 0) {UserInput = holdUserValue;}
 }
@@ -219,12 +323,22 @@ void ControlLogic()
 
 }
 
+void PlayerDeath()
+{
+    if (X > (Width - 6) || X < 0 || Y > Height || Y < 1)
+    {
+        GameOver = true;
+        ProgramEsc = true;
+    }
+}
+
 void Logic()
 {
 ControlLogic();
 
  FruitCoords();
 
+ PlayerDeath();
 
 }
 void Game()
@@ -241,7 +355,7 @@ main()
 
 while (!ProgramEsc)
   {
-fruitRandPosIncreamentor++;
+
   GameOver = false;
 
     while (!GameOver)
@@ -249,9 +363,12 @@ fruitRandPosIncreamentor++;
         Setup();
         Logic();
 
+    if (X == fruitX && Y == fruitY)
+    {
+        FruitPresent = false;
+    }
 
-
-cout << "x: "<< fruitX<< endl<< "y: "<<fruitY<<endl;
+std::cout << "x: "<< fruitX<< std::endl<< "y: "<<fruitY<<std::endl;
         Game();
 
 system("cls");
@@ -274,7 +391,6 @@ system("cls");
   }
 
 }
-
 
 
 
