@@ -365,6 +365,7 @@ while (!ProgramEsc)
 
     if (X == fruitX && Y == fruitY)
     {
+        FruitCoordsVerify = false;
         FruitPresent = false;
     }
 
