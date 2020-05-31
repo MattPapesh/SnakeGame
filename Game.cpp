@@ -9,17 +9,22 @@
 
 #include <ctime>
 
-
+    bool pass = true;
     bool GameOver = false;
     bool GameRestart = false;
     bool ProgramEsc = false;
     bool FruitPresent = false;
     bool FruitCoordsVerify = false;
 
-    int Height = 10;//17
-    int Width = 30;//50
-    int cmmdPromptDis = 25;
 
+    int cmmdPromptDis = 10;
+    int prgmDelay = 100;
+
+    const int Height = 12;
+    const int Width = 30;
+
+    const char upperBound = (char)220u;
+    const char lowerBound = (char)223u;
 
   int fruitX, fruitY;
 
@@ -29,8 +34,12 @@
   int Y = initialY ;
   int tempX = (initialX*2);
   int UserInput, holdUserValue, verifyInput;
+  char PlayerHead = 'O';
+  char Fruit = (char)15u;
+  char Matrix [Height][Width];
+  char MatrixSlot = ' ';
 
-HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
 void  Dis()
 {
@@ -38,6 +47,53 @@ void  Dis()
     {
         printf  (" ");
     }
+}
+
+void MatrixBound()
+{
+    Dis();
+
+for (int i = 0, i2 = 0, deleter = -3; i < 2; i++, i2++)
+   {
+          if (i2 > 0) {deleter = 3;}
+
+            for (int i = 0; i < (Width + 3) - deleter; i++)
+        {
+            printf ( "%c", upperBound);
+        }
+
+       if (i2 > 0) {printf ("%c %c", upperBound, (char)219u );}
+
+       printf ("\n");
+
+       Dis();
+
+       if (deleter == -3) {printf ("%c %c", (char)219u, upperBound);}
+   }
+}
+
+void MatrixBound2()
+{
+     int i, i2, deleter;
+
+    for ( i = 0, i2 = 0, deleter = 3; i < 2; i++, i2++)
+    {
+            if (i2 > 0) {deleter = -3;}
+
+           if (deleter == 3) {printf ("%c %c", (char)219u, lowerBound);}
+
+            for (int i = 0; i < (Width + 3) - deleter; i++)
+            {
+                printf ( "%c", lowerBound);
+            }
+               if (deleter == 3) {printf ("%c %c", lowerBound, (char)219u);}
+
+        if (i2 < 0) {printf ("%c %c", lowerBound, (char)219u );}    printf ("\n");
+
+        Dis();
+
+   }
+
 }
 
 void FruitCoords()
@@ -65,9 +121,8 @@ void FruitCoords()
 
 }
 
-
 void hBound()
-{
+{/*
 
  SetConsoleTextAttribute(h,FOREGROUND_BLUE);
 
@@ -111,7 +166,7 @@ printf ("| |");
 
     printf ("| |\n");
 }
-
+///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
 void DisBounderies()
 {
 
@@ -147,9 +202,8 @@ int return1 = 0;
                 printf (" ");
             }
       }
-      else
-      {
-          if (X < fruitX)
+
+          if (X < fruitX && Y == fruitY)
           {
               for (int i = 0; i < (X - 1); i++)
               {
@@ -158,11 +212,11 @@ int return1 = 0;
 
               SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
 
-              printf ("0");
+              printf ("O");
 
               SetConsoleTextAttribute(h, FOREGROUND_BLUE);
 
-              for (int i = 0; i < (fruitX - 1); i++)
+              for (int i = 0; i < ((fruitX - 1)-(X)); i++)
               {
                   printf (" ");
               }
@@ -179,10 +233,63 @@ int return1 = 0;
               }
 
           }
-      }
+
+            if (X > fruitX && Y == fruitY)
+            {
+                    for (int i = 0; i < (fruitX - 1); i++)
+                    {
+                        printf (" ");
+                    }
+
+                    SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
+
+                    printf ("O");
+
+                    SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+                    for (int i = 0; i < ((X - 1) - fruitX); i++)
+                    {
+                        printf (" ");
+                    }
+
+                    SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+
+                    printf ("O");
+
+                    SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+                    for (int i = 0; i < (tempX - X); i++)
+                    {
+                        printf (" ");
+
+                    }
+
+            }
+
+        if (fruitX == X && fruitY == Y)
+        {
+            for (int i = 0; i < (X -1); i++)
+            {
+                 printf (" ");
+            }
+
+            SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+
+            printf ("O");
+
+            SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+
+            for (int i = 0; i < (tempX - fruitX); i++)
+            {
+                printf (" ");
+            }
+        }
+
     }
 
-      else if (return1 == Y) /// This line is to find out the location of the player and print it upon the right line in the right position.
+///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        if (return1 == Y && Y != fruitY) /// This line is to find out the location of the player and print it upon the right line in the right position.
       { printf ("| |");
      for (int i = 0; i < (X-1); i++)
      {
@@ -201,7 +308,7 @@ SetConsoleTextAttribute(h,FOREGROUND_BLUE);
      }
 }
 
-else
+else if (return1 != Y && return1 != fruitY)
 { printf ("| |");
      for (int i = 0; i < tempX; i++) {printf(" ");}
 
@@ -215,18 +322,74 @@ else
     Dis();
 
     hBound2();
+*/
+}
+
+void MatrixDisplaySetup()
+{
+    int iterator1X = 0, iterator2Y = 0;
+
+for (int i = 0; i < Height; i++, iterator2Y++)
+    {
+          for (int i = 0; i < Width; i++, iterator1X++)
+            {
+            Matrix [iterator2Y][iterator1X] = MatrixSlot;
+            }
+        iterator1X = 0;
+    }
+        iterator2Y = 0;
+
+    Matrix [Y][X] = PlayerHead;
+    Matrix [fruitY] [fruitX] = Fruit;
+}
+
+void MatrixDisplay()
+{
+    MatrixBound();
+
+       int iterator1X = 0, iterator2Y = 0;
+
+    for (int i = 0; i < Height; i++, iterator2Y++)
+        {
+                printf ("%c %c", (char)219u, (char)219u);
+
+            for (int i = 0; i < Width; i++, iterator1X++)
+            {
+                printf("%c",Matrix [iterator2Y][iterator1X] );
+
+            }
+
+                printf ("%c %c", (char)219u, (char)219u);
+
+             printf ("\n"); Dis(); iterator1X = 0;
+        }
+            iterator2Y = 0;
+
+    MatrixBound2();
+
+}
+
+bool MatrixDisAllowOnce = true;
+
+void MatrixDisplay2()
+{
+    int parameterX = cmmdPromptDis + X + 3, parameterY = Y + 4, tempPosX = X, tempPasY = Y;
+
+    if (MatrixDisAllowOnce == true || (tempPosX != X && tempPasY != Y) )
+    {
+        printf("%c", PlayerHead); MatrixDisAllowOnce = false;
+    }
 
 }
 
 void Setup()
 {
-    DisBounderies();
 
+       MatrixDisplaySetup();
+
+       MatrixDisplay();
 
 }
-
-
-
 
 void OtherControls()
 {
@@ -253,9 +416,6 @@ if (UserInput == 115) {Y++; holdUserValue = 115; verifyInput++;}
 if (UserInput == 97) {X--; holdUserValue = 97; verifyInput++;}
 
 if (UserInput == 100) {X++; holdUserValue = 100; verifyInput++;}
-std::cout << UserInput;
- printf ("\n");
-if(verifyInput > 0) {UserInput = holdUserValue;}
 }
 
 void KeyBoardFunctions()
@@ -267,21 +427,20 @@ void KeyBoardFunctions()
 void ControlLogic()
 {
  KeyBoardFunctions();
-
-
 }
 
 void PlayerDeath()
 {
-    if (X >= )
+    if (X > (Width) || X < 0 || Y > Height || Y < 0)
     {
-
+        GameOver = true;
+        ProgramEsc = true;
     }
 }
 
 void Logic()
 {
-ControlLogic();
+ ControlLogic();
 
  FruitCoords();
 
@@ -293,9 +452,6 @@ void Game()
 
 
 }
-
-
-
 
 main()
 {
@@ -309,16 +465,16 @@ while (!ProgramEsc)
     {
         Setup();
         Logic();
+        Game();
 
     if (X == fruitX && Y == fruitY)
     {
+        FruitCoordsVerify = false;
         FruitPresent = false;
     }
 
-std::cout << "x: "<< fruitX<< std::endl<< "y: "<<fruitY<<std::endl;
-        Game();
-
-system("cls");
+     Sleep(prgmDelay);
+    system("cls");
         }
 
         if (GameRestart = true)
@@ -338,7 +494,6 @@ system("cls");
   }
 
 }
-
 
 
 
