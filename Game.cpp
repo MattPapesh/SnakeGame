@@ -9,16 +9,14 @@
 
 #include <ctime>
 
-    bool pass = true;
     bool GameOver = false;
     bool GameRestart = false;
     bool ProgramEsc = false;
     bool FruitPresent = false;
     bool FruitCoordsVerify = false;
 
-
     int cmmdPromptDis = 10;
-    int prgmDelay = 100;
+    int prgmDelay = 150;
 
     const int Height = 12;
     const int Width = 30;
@@ -30,14 +28,116 @@
 
   int initialX = ((Width -6)/2);
   int initialY = (Height /2);
-  int X = initialX ;
-  int Y = initialY ;
+  int X = initialX, changeInX;
+  int Y = initialY;
   int tempX = (initialX*2);
   int UserInput, holdUserValue, verifyInput;
-  char PlayerHead = 'O';
+
+  char PlayerHead = '0';/// moved into class
+  char PlayerBodySegment = 'O';
   char Fruit = (char)15u;
   char Matrix [Height][Width];
   char MatrixSlot = ' ';
+
+       struct bodySegment
+{
+    int SegmentX, SegmentY;
+    bodySegment* nextSegment;
+};
+
+class bodySegmentFunctions
+{
+    private:
+        bodySegment* head;
+        bodySegment* tail;
+
+        char PlayerHead = '0';
+        char PlayerBodySegment = 'O';
+
+    public:
+        bodySegmentFunctions()
+        {
+            head = NULL;
+            tail = NULL;
+        }
+
+    void createSegment(int inputX, int inputY)
+        {
+            bodySegment* temp = new bodySegment;
+
+            (*temp).SegmentX = inputX;
+            (*temp).SegmentY = inputY;
+            (*temp).nextSegment = NULL;
+
+            if (head == NULL)
+            {
+                head = temp;
+                tail = temp;
+                temp = NULL;
+            }
+            else
+            {
+                (*tail).nextSegment = temp;
+
+                tail = temp;
+            }
+        }
+
+    int displayPlayer()
+    {
+        bodySegment* currentSegment = new bodySegment;
+
+        currentSegment = head;
+
+        while (currentSegment != NULL)
+        {
+            if (currentSegment == head)
+            {
+                Matrix [(*currentSegment).SegmentY][(*currentSegment).SegmentX] = PlayerHead;
+            }
+            else
+            {
+                Matrix [(*currentSegment).SegmentY][(*currentSegment).SegmentX] = PlayerBodySegment;
+            }
+
+
+            currentSegment = (*currentSegment).nextSegment;
+        }
+    }
+
+    void addBodySegment(int inputX, int inputY)
+    {
+        bodySegment* temp = new bodySegment;
+
+        (*temp).SegmentX = inputX;
+        (*temp).SegmentY = inputY;
+
+        (*temp).nextSegment = head;
+
+        head = temp;
+    }
+
+    void removeBodySegment()
+    {
+        bodySegment* currentSegment = new bodySegment;
+        bodySegment* previousSegment = new bodySegment;
+
+        currentSegment = head;
+
+        while ((*currentSegment).nextSegment != NULL)
+        {
+            previousSegment = currentSegment;
+
+            currentSegment = (*currentSegment).nextSegment;
+        }
+
+        tail = previousSegment;
+
+        (*previousSegment).nextSegment = NULL;
+
+        delete currentSegment;
+    }
+};
 
         HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -45,12 +145,13 @@ void  Dis()
 {
     for (int i = 0; i < cmmdPromptDis; i++)
     {
-        printf  (" ");
+        printf (" ");
     }
 }
 
 void MatrixBound()
-{
+{SetConsoleTextAttribute (h, FOREGROUND_BLUE|FOREGROUND_RED);
+
     Dis();
 
 for (int i = 0, i2 = 0, deleter = -3; i < 2; i++, i2++)
@@ -114,215 +215,7 @@ void FruitCoords()
         {
          fruitY = fruitY + 2;
         }
-
-
     }
-
-
-}
-
-void hBound()
-{/*
-
- SetConsoleTextAttribute(h,FOREGROUND_BLUE);
-
-    for (int i=0; i < Width; i++)
-    {
-        printf ("_");
-    }
-
-    printf ("\n");
-    Dis();
-    for (int i=0; i < Width; i++)
-
-    {
-        printf ("_");
-    }
-
-
-}
-void hBound2()
-{
-    printf ("| |");
-
- for (int i=6; i < (Width); i++)
-    {
-        printf ("_");
-    }
-
-printf ("| |");
-
-    printf ("\n");
-
-    Dis();
-
-    printf ("| |");
-
-    for (int i=6; i < Width; i++)
-
-    {
-        printf ("_");
-    }
-
-    printf ("| |\n");
-}
-///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
-void DisBounderies()
-{
-
-    Dis();
-    hBound();
-    printf ("\n");
-
-int return1 = 0;
-
-    for (int i=0; i < Height; i++)
-    {return1++;
-         Dis();
-
-      if (return1 == fruitY)
-      {
-          printf ("| |");
-
-          if (fruitY != Y)
-          {
-
-          for (int i = 0; i < (fruitX-1); i++)
-          {
-                printf (" ");
-          }
-                SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
-
-                printf ("O");
-
-                SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-
-            for (int i = 0; i < (tempX - fruitX); i++)
-            {
-                printf (" ");
-            }
-      }
-
-          if (X < fruitX && Y == fruitY)
-          {
-              for (int i = 0; i < (X - 1); i++)
-              {
-                  printf (" ");
-              }
-
-              SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-
-              printf ("O");
-
-              SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-
-              for (int i = 0; i < ((fruitX - 1)-(X)); i++)
-              {
-                  printf (" ");
-              }
-
-              SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
-
-              printf ("O");
-
-              SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-
-              for (int i = 0; i < (tempX - fruitX); i++)
-              {
-                  printf (" ");
-              }
-
-          }
-
-            if (X > fruitX && Y == fruitY)
-            {
-                    for (int i = 0; i < (fruitX - 1); i++)
-                    {
-                        printf (" ");
-                    }
-
-                    SetConsoleTextAttribute(h, FOREGROUND_RED|FOREGROUND_INTENSITY);
-
-                    printf ("O");
-
-                    SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-
-                    for (int i = 0; i < ((X - 1) - fruitX); i++)
-                    {
-                        printf (" ");
-                    }
-
-                    SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-
-                    printf ("O");
-
-                    SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-
-                    for (int i = 0; i < (tempX - X); i++)
-                    {
-                        printf (" ");
-
-                    }
-
-            }
-
-        if (fruitX == X && fruitY == Y)
-        {
-            for (int i = 0; i < (X -1); i++)
-            {
-                 printf (" ");
-            }
-
-            SetConsoleTextAttribute(h, FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-
-            printf ("O");
-
-            SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-
-            for (int i = 0; i < (tempX - fruitX); i++)
-            {
-                printf (" ");
-            }
-        }
-
-    }
-
-///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        if (return1 == Y && Y != fruitY) /// This line is to find out the location of the player and print it upon the right line in the right position.
-      { printf ("| |");
-     for (int i = 0; i < (X-1); i++)
-     {
-         printf (" ");
-     }
-
- SetConsoleTextAttribute(h,FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-
-     printf ("O");
-
-SetConsoleTextAttribute(h,FOREGROUND_BLUE);
-
-     for (int i = 0; i < (tempX - X); i++)
-     {
-         printf (" ");
-     }
-}
-
-else if (return1 != Y && return1 != fruitY)
-{ printf ("| |");
-     for (int i = 0; i < tempX; i++) {printf(" ");}
-
-}
-
-     for (int i; i < (X - Width); i++) {printf (" ");}
-
-      printf ("| |\n");
-    }
-
-    Dis();
-
-    hBound2();
-*/
 }
 
 void MatrixDisplaySetup()
@@ -339,7 +232,12 @@ for (int i = 0; i < Height; i++, iterator2Y++)
     }
         iterator2Y = 0;
 
-    Matrix [Y][X] = PlayerHead;
+        bodySegmentFunctions instance;//Instantiates the linked list/ snake body segments class called bodySegmentFunstions
+
+        instance.createSegment(X, Y);// creates the head and stores it in the linked list.
+
+        instance.displayPlayer();
+
     Matrix [fruitY] [fruitX] = Fruit;
 }
 
@@ -355,11 +253,17 @@ void MatrixDisplay()
 
             for (int i = 0; i < Width; i++, iterator1X++)
             {
+                SetConsoleTextAttribute (h, FOREGROUND_INTENSITY|FOREGROUND_GREEN);
+                if (Matrix [iterator2Y][iterator1X] == Fruit)
+                {
+                    SetConsoleTextAttribute (h, FOREGROUND_RED);
+                }
                 printf("%c",Matrix [iterator2Y][iterator1X] );
 
             }
+             SetConsoleTextAttribute (h, FOREGROUND_BLUE|FOREGROUND_RED);
 
-                printf ("%c %c", (char)219u, (char)219u);
+             printf ("%c %c", (char)219u, (char)219u);
 
              printf ("\n"); Dis(); iterator1X = 0;
         }
@@ -373,9 +277,9 @@ bool MatrixDisAllowOnce = true;
 
 void MatrixDisplay2()
 {
-    int parameterX = cmmdPromptDis + X + 3, parameterY = Y + 4, tempPosX = X, tempPasY = Y;
+    int parameterX = cmmdPromptDis + X + 3, parameterY = Y + 4, tempPosX = X, tempPosY = Y;
 
-    if (MatrixDisAllowOnce == true || (tempPosX != X && tempPasY != Y) )
+    if (MatrixDisAllowOnce == true || (tempPosX != X && tempPosY != Y) )
     {
         printf("%c", PlayerHead); MatrixDisAllowOnce = false;
     }
@@ -385,9 +289,9 @@ void MatrixDisplay2()
 void Setup()
 {
 
-       MatrixDisplaySetup();
+    MatrixDisplaySetup();
 
-       MatrixDisplay();
+    MatrixDisplay();
 
 }
 
@@ -494,6 +398,3 @@ while (!ProgramEsc)
   }
 
 }
-
-
-
