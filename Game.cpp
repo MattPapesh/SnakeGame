@@ -16,10 +16,10 @@
     bool FruitCoordsVerify = false;
 
     int cmmdPromptDis = 10;
-    int prgmDelay = 150;
+    int prgmDelay = 50;
 
-    const int Height = 12;
-    const int Width = 30;
+    const int Height = 20;
+    const int Width = 50;
 
     const char upperBound = (char)220u;
     const char lowerBound = (char)223u;
@@ -30,6 +30,7 @@
   int initialY = (Height /2);
   int X = initialX, changeInX;
   int Y = initialY;
+
   int tempX = (initialX*2);
   int UserInput, holdUserValue, verifyInput;
 
@@ -47,14 +48,13 @@
 
 class bodySegmentFunctions
 {
-    private:
+    public:
         bodySegment* head;
         bodySegment* tail;
 
-        char PlayerHead = '0';
-        char PlayerBodySegment = 'O';
+        char PlayerHead = (char)219u;
+        char PlayerBodySegment = (char)219u;
 
-    public:
         bodySegmentFunctions()
         {
             head = NULL;
@@ -100,7 +100,6 @@ class bodySegmentFunctions
                 Matrix [(*currentSegment).SegmentY][(*currentSegment).SegmentX] = PlayerBodySegment;
             }
 
-
             currentSegment = (*currentSegment).nextSegment;
         }
     }
@@ -112,9 +111,10 @@ class bodySegmentFunctions
         (*temp).SegmentX = inputX;
         (*temp).SegmentY = inputY;
 
-        (*temp).nextSegment = head;
+        (*temp).nextSegment = NULL;
 
-        head = temp;
+        (*tail).nextSegment = temp;
+
     }
 
     void removeBodySegment()
@@ -147,6 +147,16 @@ void  Dis()
     {
         printf (" ");
     }
+}
+
+void CursurPos(int x, int y)
+{
+    COORD instance;
+
+    instance.X = x;
+    instance.Y = y;
+
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),instance);
 }
 
 void MatrixBound()
@@ -232,13 +242,13 @@ for (int i = 0; i < Height; i++, iterator2Y++)
     }
         iterator2Y = 0;
 
-        bodySegmentFunctions instance;//Instantiates the linked list/ snake body segments class called bodySegmentFunstions
+        bodySegmentFunctions bSFinstance;//Instantiates the linked list/ snake body segments class called bodySegmentFunstions
 
-        instance.createSegment(X, Y);// creates the head and stores it in the linked list.
+        bSFinstance.createSegment(X, Y);// creates the head and stores it in the linked list.
 
-        instance.displayPlayer();
+        bSFinstance.displayPlayer();
 
-    Matrix [fruitY] [fruitX] = Fruit;
+        Matrix [fruitY][fruitX] = Fruit;
 }
 
 void MatrixDisplay()
@@ -254,6 +264,7 @@ void MatrixDisplay()
             for (int i = 0; i < Width; i++, iterator1X++)
             {
                 SetConsoleTextAttribute (h, FOREGROUND_INTENSITY|FOREGROUND_GREEN);
+
                 if (Matrix [iterator2Y][iterator1X] == Fruit)
                 {
                     SetConsoleTextAttribute (h, FOREGROUND_RED);
@@ -286,14 +297,59 @@ void MatrixDisplay2()
 
 }
 
-void Setup()
+void DisplayMatrixContinous()
 {
+    int y = 1 + Height; int x = 12 + Width;
 
-    MatrixDisplaySetup();
+    int iterator1X = 0, iterator2Y = 0;
 
-    MatrixDisplay();
+    CursurPos (13,2);
+
+   for (int iY = 2; iY <= y; iY++, iterator2Y++)
+   {
+       for (int iX = 13; iX <= x; iX++, iterator1X++)
+    {
+        CursurPos (iX, iY);
+
+        if (Matrix [iterator2Y][iterator1X] == Fruit)
+        {
+            SetConsoleTextAttribute (h, FOREGROUND_RED);
+        }
+        else
+        {
+            SetConsoleTextAttribute (h, FOREGROUND_INTENSITY|FOREGROUND_GREEN);
+        }
+
+        printf("%c",Matrix [iterator2Y][iterator1X] );
+    }
+
+    SetConsoleTextAttribute (h, FOREGROUND_BLUE|FOREGROUND_RED);
+
+    iterator1X = 0;
+   }
+iterator2Y = 0;
 
 }
+
+bool once = false;
+void Setup()
+{
+    MatrixDisplaySetup();
+
+    if (!once)
+    {
+        once = true;
+       MatrixDisplay();
+    }
+    else
+    {
+       DisplayMatrixContinous();
+    }
+
+}
+
+
+
 
 void OtherControls()
 {
@@ -354,7 +410,6 @@ void Logic()
 void Game()
 {
 
-
 }
 
 main()
@@ -367,8 +422,9 @@ while (!ProgramEsc)
 
     while (!GameOver)
     {
-        Setup();
         Logic();
+        Setup();
+
         Game();
 
     if (X == fruitX && Y == fruitY)
@@ -378,7 +434,8 @@ while (!ProgramEsc)
     }
 
      Sleep(prgmDelay);
-    system("cls");
+
+   //  system("cls");
         }
 
         if (GameRestart = true)
