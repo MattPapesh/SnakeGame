@@ -40,6 +40,9 @@
   char Matrix [Height][Width];
   char MatrixSlot = ' ';
 
+  bool once = false;
+  bool intervalOdd = true, intervalEven = false;
+
        struct bodySegment
 {
     int SegmentX, SegmentY;
@@ -102,6 +105,8 @@ class bodySegmentFunctions
 
             currentSegment = (*currentSegment).nextSegment;
         }
+
+        return 0;
     }
 
     void addBodySegment(int inputX, int inputY)
@@ -138,6 +143,8 @@ class bodySegmentFunctions
         delete currentSegment;
     }
 };
+
+        bodySegmentFunctions bSFinstance;//Instantiates the linked list/ snake body segments class called bodySegmentFunctions
 
         HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -242,13 +249,23 @@ for (int i = 0; i < Height; i++, iterator2Y++)
     }
         iterator2Y = 0;
 
-        bodySegmentFunctions bSFinstance;//Instantiates the linked list/ snake body segments class called bodySegmentFunstions
-
+    if (!once)
+    {
         bSFinstance.createSegment(X, Y);// creates the head and stores it in the linked list.
+    }
+
+    (* (bSFinstance.head) ).SegmentX = X; ( (*bSFinstance.head) ).SegmentY = Y;
+
+
+        Matrix [fruitY][fruitX] = Fruit;
+
+        if ( Matrix [fruitY][fruitX] == Matrix [( *(bSFinstance.head) ).SegmentY] [( *(bSFinstance.head) ).SegmentX])
+        {
+            Matrix [fruitY] [fruitX] = PlayerHead;
+        }
 
         bSFinstance.displayPlayer();
 
-        Matrix [fruitY][fruitX] = Fruit;
 }
 
 void MatrixDisplay()
@@ -286,17 +303,6 @@ void MatrixDisplay()
 
 bool MatrixDisAllowOnce = true;
 
-void MatrixDisplay2()
-{
-    int parameterX = cmmdPromptDis + X + 3, parameterY = Y + 4, tempPosX = X, tempPosY = Y;
-
-    if (MatrixDisAllowOnce == true || (tempPosX != X && tempPosY != Y) )
-    {
-        printf("%c", PlayerHead); MatrixDisAllowOnce = false;
-    }
-
-}
-
 void DisplayMatrixContinous()
 {
     int y = 1 + Height; int x = 12 + Width;
@@ -331,19 +337,27 @@ iterator2Y = 0;
 
 }
 
-bool once = false;
+
 void Setup()
 {
     MatrixDisplaySetup();
 
     if (!once)
     {
-        once = true;
-       MatrixDisplay();
+        once = true, intervalOdd = false, intervalEven = true;
+
+        MatrixDisplay(); bSFinstance.addBodySegment( ( ( *bSFinstance.head).SegmentX),( (*bSFinstance.head).SegmentY) );
     }
     else
     {
        DisplayMatrixContinous();
+
+   //bSFinstance.removeBodySegment();
+
+    (* (( *(bSFinstance.head) ).nextSegment) ).SegmentX =  ( *(bSFinstance.head) ).SegmentX;
+
+    (* (( *(bSFinstance.head) ).nextSegment) ).SegmentY =  ( *(bSFinstance.head) ).SegmentY;
+
     }
 
 }
@@ -369,13 +383,17 @@ if (UserInput == 114) {GameOver = true; Sleep(500); GameRestart = true;}
 
 void GameControls()
 {
- if (UserInput == 119) {Y--; holdUserValue = 119; verifyInput++;}
+ if (UserInput == 119 && holdUserValue != 115) {Y--; holdUserValue = 119; verifyInput++;}
+ else if (UserInput == 119 && holdUserValue == 115) {Y++;}
 
-if (UserInput == 115) {Y++; holdUserValue = 115; verifyInput++;}
+if (UserInput == 115 && holdUserValue != 119) {Y++; holdUserValue = 115; verifyInput++;}
+else if (UserInput == 115 && holdUserValue == 119) {Y--;}
 
-if (UserInput == 97) {X--; holdUserValue = 97; verifyInput++;}
+if (UserInput == 97 && holdUserValue != 100) {X--; holdUserValue = 97; verifyInput++;}
+else if (UserInput == 97 && holdUserValue == 100) {X++;}
 
-if (UserInput == 100) {X++; holdUserValue = 100; verifyInput++;}
+if (UserInput == 100 && holdUserValue != 97) {X++; holdUserValue = 100; verifyInput++;}
+else if (UserInput == 100 && holdUserValue == 97) {X--;}
 }
 
 void KeyBoardFunctions()
@@ -400,11 +418,13 @@ void PlayerDeath()
 
 void Logic()
 {
+ PlayerDeath();
+
  ControlLogic();
 
  FruitCoords();
 
- PlayerDeath();
+
 
 }
 void Game()
@@ -435,7 +455,6 @@ while (!ProgramEsc)
 
      Sleep(prgmDelay);
 
-   //  system("cls");
         }
 
         if (GameRestart = true)
