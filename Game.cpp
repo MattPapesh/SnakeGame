@@ -16,10 +16,10 @@
     bool FruitCoordsVerify = false;
 
     int cmmdPromptDis = 10;
-    int prgmDelay = 50;
+    int prgmDelay = 100;
 
-    const int Height = 20;
-    const int Width = 50;
+    const int Height = 10;
+    const int Width = 25;
 
     const char upperBound = (char)220u;
     const char lowerBound = (char)223u;
@@ -30,20 +30,19 @@
   int initialY = (Height /2);
   int X = initialX, changeInX;
   int Y = initialY;
+  int bodySegmentsAfterHead = 0;
 
   int tempX = (initialX*2);
   int UserInput, holdUserValue, verifyInput;
 
-  char PlayerHead = '0';/// moved into class
-  char PlayerBodySegment = 'O';
+  char PlayerHead = 'O';
   char Fruit = (char)15u;
   char Matrix [Height][Width];
   char MatrixSlot = ' ';
 
   bool once = false;
-  bool intervalOdd = true, intervalEven = false;
 
-       struct bodySegment
+    struct bodySegment
 {
     int SegmentX, SegmentY;
     bodySegment* nextSegment;
@@ -52,6 +51,9 @@
 class bodySegmentFunctions
 {
     public:
+
+        bool AddSeg = true;
+
         bodySegment* head;
         bodySegment* tail;
 
@@ -109,39 +111,58 @@ class bodySegmentFunctions
         return 0;
     }
 
-    void addBodySegment(int inputX, int inputY)
-    {
-        bodySegment* temp = new bodySegment;
-
-        (*temp).SegmentX = inputX;
-        (*temp).SegmentY = inputY;
-
-        (*temp).nextSegment = NULL;
-
-        (*tail).nextSegment = temp;
-
-    }
-
-    void removeBodySegment()
-    {
-        bodySegment* currentSegment = new bodySegment;
-        bodySegment* previousSegment = new bodySegment;
-
-        currentSegment = head;
-
-        while ((*currentSegment).nextSegment != NULL)
+        void snakeGrowth(int bodySegments)
         {
-            previousSegment = currentSegment;
+            if (AddSeg)
+            {
+                 for (int i = 0; i <= bodySegments; i++)
+                {
+                    createSegment(-1, 0);
+                }
 
-            currentSegment = (*currentSegment).nextSegment;
+                AddSeg = false;
+            }
+
+            updateSegmentCoords(bodySegments);
+
         }
 
-        tail = previousSegment;
+        void updateSegmentCoords(int bodySegments)
+        {
 
-        (*previousSegment).nextSegment = NULL;
+            bodySegment* currentSegment = new bodySegment;
+            bodySegment* previousSegment = new bodySegment;
+            bodySegment* nextSaved = new bodySegment;
+            bodySegment* previousSaved = new bodySegment;
 
-        delete currentSegment;
+            currentSegment = head;
+
+            (*previousSaved).SegmentX = (*currentSegment).SegmentX;
+            (*previousSaved).SegmentY = (*currentSegment).SegmentY;
+
+            (*nextSaved).SegmentX = ( *(*currentSegment).nextSegment).SegmentX;
+            (*nextSaved).SegmentY = ( *(*currentSegment).nextSegment).SegmentY;
+
+
+             for (int i = 0; i < bodySegments; i++)
+            {
+              previousSegment = currentSegment;
+              currentSegment = (*currentSegment).nextSegment;
+
+              (*currentSegment).SegmentX = (*previousSaved).SegmentX;
+              (*currentSegment).SegmentY = (*previousSaved).SegmentY;
+
+            (*previousSaved).SegmentX = (*nextSaved).SegmentX;
+            (*previousSaved).SegmentY = (*nextSaved).SegmentY;
+
+            (*nextSaved).SegmentX = ( *(*currentSegment).nextSegment).SegmentX;
+            (*nextSaved).SegmentY = ( *(*currentSegment).nextSegment).SegmentY;
+
+            }
+
+            delete previousSaved, nextSaved, currentSegment, previousSegment;
     }
+
 };
 
         bodySegmentFunctions bSFinstance;//Instantiates the linked list/ snake body segments class called bodySegmentFunctions
@@ -216,7 +237,6 @@ void MatrixBound2()
 
 void FruitCoords()
 {
-
     while (!FruitCoordsVerify)
     {
         srand(time(NULL));
@@ -251,17 +271,21 @@ for (int i = 0; i < Height; i++, iterator2Y++)
 
     if (!once)
     {
-        bSFinstance.createSegment(X, Y);// creates the head and stores it in the linked list.
+        bSFinstance.createSegment(X, Y);
     }
 
     (* (bSFinstance.head) ).SegmentX = X; ( (*bSFinstance.head) ).SegmentY = Y;
-
 
         Matrix [fruitY][fruitX] = Fruit;
 
         if ( Matrix [fruitY][fruitX] == Matrix [( *(bSFinstance.head) ).SegmentY] [( *(bSFinstance.head) ).SegmentX])
         {
             Matrix [fruitY] [fruitX] = PlayerHead;
+
+            bodySegmentsAfterHead++;
+
+            bSFinstance.AddSeg = true;
+
         }
 
         bSFinstance.displayPlayer();
@@ -337,33 +361,24 @@ iterator2Y = 0;
 
 }
 
-
 void Setup()
 {
     MatrixDisplaySetup();
 
     if (!once)
     {
-        once = true, intervalOdd = false, intervalEven = true;
+        once = true;
 
-        MatrixDisplay(); bSFinstance.addBodySegment( ( ( *bSFinstance.head).SegmentX),( (*bSFinstance.head).SegmentY) );
+        MatrixDisplay();
     }
     else
     {
        DisplayMatrixContinous();
 
-   //bSFinstance.removeBodySegment();
-
-    (* (( *(bSFinstance.head) ).nextSegment) ).SegmentX =  ( *(bSFinstance.head) ).SegmentX;
-
-    (* (( *(bSFinstance.head) ).nextSegment) ).SegmentY =  ( *(bSFinstance.head) ).SegmentY;
-
+       bSFinstance.snakeGrowth(bodySegmentsAfterHead);
     }
 
 }
-
-
-
 
 void OtherControls()
 {
