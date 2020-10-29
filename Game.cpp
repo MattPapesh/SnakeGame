@@ -758,7 +758,7 @@ while (!ProgramEsc)
         system("cls");
     }
     else
-    {
+    { 
         ProgramEsc = true;
     }
 
